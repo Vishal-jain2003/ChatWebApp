@@ -1,31 +1,34 @@
 # Chat Web Application (Backend)
 
 ## Overview
-This is the backend for a real-time chat web application built using Spring Boot, MongoDB, and WebSockets. The backend provides APIs for managing chat rooms and messages, ensuring efficient and scalable communication.
+This is the backend for a real-time chat web application built using **Spring Boot**, **MongoDB**, and **WebSockets**. The backend provides APIs and WebSocket endpoints for managing chat rooms and messages, ensuring seamless communication.
 
 ## Technologies Used
 - **Spring Boot** - Backend framework
 - **MongoDB** - NoSQL database for storing messages and rooms
 - **Spring WebSockets** - Real-time communication
+- **STOMP & SockJS** - WebSocket protocol & fallback support
+- **Spring Messaging** - Message handling
 - **Lombok** - Reducing boilerplate code
 - **Maven** - Dependency management
 
 ## Features
 - Create and join chat rooms
 - Store and retrieve messages with pagination
-- WebSockets for real-time messaging (planned)
+- **WebSockets for real-time messaging**
+- Efficient message broadcasting using **STOMP & SockJS**
 
 ## Project Structure
 ```
 ChatWebApp/
 ├── src/
 │   ├── main/
-│   │   ├── java/com/chatapp/
-│   │   │   ├── controller/    # Handles API requests
-│   │   │   ├── service/       # Business logic layer
-│   │   │   ├── model/         # Entity definitions
-│   │   │   ├── repository/    # Database interactions
-│   │   │   ├── config/        # WebSocket and database configurations
+│   │   ├── java/com/substring/chat/
+│   │   │   ├── config/        # WebSocket & database configurations
+│   │   │   ├── controllers/   # Handles API & WebSocket requests
+│   │   │   ├── entities/      # Entity definitions (Message, Room, User)
+│   │   │   ├── payload/       # Request & response DTOs
+│   │   │   ├── repositories/  # Database interactions
 │   ├── resources/
 │   │   ├── application.properties  # Application configurations
 ├── pom.xml   # Maven dependencies
@@ -46,11 +49,28 @@ ChatWebApp/
 ```
 Users can join multiple rooms, and each room contains multiple messages from different users.
 
-## High-Level Architecture
-```
-Client (React)  -->  WebSocket Server (Spring Boot)  -->  MongoDB (Database)
-```
-The frontend connects to the WebSocket server for real-time updates, while the backend stores chat history in MongoDB.
+## WebSocket Workflow
+1. **Client connects** to the WebSocket server at `/chat`.
+2. **Users send messages** to `/app/sendMessage/{roomId}`.
+3. **Backend processes the message**, stores it in MongoDB.
+4. **Backend broadcasts** the message to `/topic/room/{roomId}`.
+5. **Clients subscribed** to this topic instantly receive the message.
+
+## WebSocket Endpoints
+- **Connect to WebSocket:**
+  - `ws://localhost:8080/chat`
+- **Send Message:**
+  - Endpoint: `/app/sendMessage/{roomId}`
+  - Request Body:
+    ```json
+    {
+      "content": "Hello, world!",
+      "sender": "Vishal",
+      "roomId": "12345"
+    }
+    ```
+- **Receive Messages (Subscription):**
+  - Topic: `/topic/room/{roomId}`
 
 ## Installation & Setup
 1. Clone the repository:
@@ -83,9 +103,9 @@ The frontend connects to the WebSocket server for real-time updates, while the b
   - Response: `200 OK` with message list
 
 ## Future Enhancements
-- Implement WebSockets for real-time chat
 - User authentication and authorization
 - Frontend integration with React
+- Typing indicators and user presence detection
 
 ## Contributing
 Contributions are welcome! Feel free to submit a pull request.
