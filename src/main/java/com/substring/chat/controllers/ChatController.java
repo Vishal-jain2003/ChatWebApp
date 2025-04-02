@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.time.LocalDateTime;
 
 @Controller
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin(origins = "${frontend.url}")  // Dynamic frontend URL
 public class ChatController {
 
 
